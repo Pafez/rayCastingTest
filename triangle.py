@@ -16,7 +16,8 @@ PLAYER_ROTATION_SPEED = 0.2
 RAY_COUNT = 500
 FOV = pi/3
 
-CANVAS3D_WIDTH = int(CANVAS_WIDTH+CANVAS_WIDTH/2*FOV/(2*pi))
+adjusted_fov = pi*((FOV/pi)%2)
+CANVAS3D_WIDTH = int(CANVAS_WIDTH+CANVAS_WIDTH/2*adjusted_fov/(2*pi))
 CANVAS3D_HEIGHT = CANVAS_HEIGHT
 CANVAS3D_STRIP_WIDTH = CANVAS3D_WIDTH/RAY_COUNT
 
@@ -26,11 +27,12 @@ canvas.set_canvas_background_fill(FLOOR_COLOR)
 
 def main():
     
-    player1 = Player(Point(300, 300), 0, FOV)
+    player1 = Player(Point(300, 300), 0, adjusted_fov)
 
     run = True
     while run:
         key_events = canvas.get_new_key_presses()
+        key_events.extend(canvas3D.get_new_key_presses())
         for i in range(len(key_events)):
             key_events[i] = key_events[i].keysym
 
@@ -58,7 +60,7 @@ def main():
                     ray.segment = segment
                     ray.intersection = intersection
             if ray.segment != None:
-                join(canvas, ray.safe_origin, ray.intersection)
+                draw_ray(canvas, ray)
                 draw_strip(canvas3D, ray_index, find_height(distance_2P(ray.origin, ray.intersection)), ray.segment.color)
 
         player1.reconstruct()
@@ -70,15 +72,15 @@ def main():
         canvas3D.clear()
     
 class Player:
-    def __init__(self, centre, direct, fov=2*pi, ray_count = RAY_COUNT):
+    def __init__(self, centre, direct, adjusted_fov=2*pi, ray_count = RAY_COUNT):
         global canvas
         self.centre = centre
         self.direct = direct
-        self.fov = fov
+        self.adjusted_fov = adjusted_fov
 
         self.vision_rays = []
         for i in range(ray_count):
-            direct = fov*i/ray_count - fov/2
+            direct = adjusted_fov*i/ray_count - adjusted_fov/2
             self.vision_rays.append(Ray_XSegment(Point(0, 0), direct, direction_offset=self.direct, safe_distance=15))
 
         self.construct()
@@ -154,6 +156,9 @@ def draw_segments(canvas):
 
 def join(canvas, point1: Point, point2: Point):
     canvas.create_line(point1.x, point1.y, point2.x, point2.y)
+
+def draw_ray(canvas, ray):
+    join(canvas, ray.safe_origin, ray.intersection)
 
 def draw_strip(canvas, index, height, color):
     canvas.create_rectangle(
