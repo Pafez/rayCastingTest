@@ -44,6 +44,8 @@ def main():
                     break
                 case 'w':
                     player1.move(PLAYER_MOVEMENT_SPEED)
+                case 's':
+                    player1.move(-PLAYER_MOVEMENT_SPEED)
                 case 'a':
                     player1.rotate(PLAYER_ROTATION_SPEED)
                 case 'd':
