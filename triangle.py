@@ -7,14 +7,22 @@ from raysegCalc import *
 CANVAS_WIDTH = 400
 CANVAS_HEIGHT = 400
 SEGMENT_COUNT = 4 + 7
+COLORS = ["red", "green", "blue", "orange", "purple", "cyan", "yellow"]
+FLOOR_COLOR = "lightgrey"
 
 PLAYER_NECK_LENGTH = 10
 PLAYER_MOVEMENT_SPEED = 3
 PLAYER_ROTATION_SPEED = 0.2
-RAY_COUNT = 100
-FOV = pi/2
+RAY_COUNT = 500
+FOV = pi/3
+
+CANVAS3D_WIDTH = int(CANVAS_WIDTH+CANVAS_WIDTH/2*FOV/(2*pi))
+CANVAS3D_HEIGHT = CANVAS_HEIGHT
+CANVAS3D_STRIP_WIDTH = CANVAS3D_WIDTH/RAY_COUNT
 
 canvas = Canvas(CANVAS_WIDTH, CANVAS_HEIGHT)
+canvas3D = Canvas(CANVAS3D_WIDTH, CANVAS3D_HEIGHT)
+canvas.set_canvas_background_fill(FLOOR_COLOR)
 
 def main():
     
@@ -39,8 +47,8 @@ def main():
                 case 'd':
                     player1.rotate(-PLAYER_ROTATION_SPEED)
 
-        mouse = Point(canvas.get_mouse_x(), canvas.get_mouse_y())
-        for ray in player1.vision_rays:
+        for ray_index in range(len(player1.vision_rays)):
+            ray = player1.vision_rays[ray_index]
             ray.origin = player1.head
             ray.direct_offset = player1.direct
             ray.segment = None
@@ -51,6 +59,7 @@ def main():
                     ray.intersection = intersection
             if ray.segment != None:
                 join(canvas, ray.safe_origin, ray.intersection)
+                draw_strip(canvas3D, ray_index, find_height(distance_2P(ray.origin, ray.intersection)), ray.segment.color)
 
         player1.reconstruct()
         draw_segments(canvas)
@@ -58,6 +67,7 @@ def main():
         canvas.update()
         sleep(0.05)
         canvas.clear()
+        canvas3D.clear()
     
 class Player:
     def __init__(self, centre, direct, fov=2*pi, ray_count = RAY_COUNT):
@@ -127,7 +137,8 @@ for i in range(SEGMENT_COUNT-4):
     segments.append(
         Segment(
             Point(randint(0, CANVAS_WIDTH), randint(0, CANVAS_HEIGHT)),
-            Point(randint(0, CANVAS_WIDTH), randint(0, CANVAS_HEIGHT))
+            Point(randint(0, CANVAS_WIDTH), randint(0, CANVAS_HEIGHT)),
+            COLORS[randint(0, len(COLORS)-1)]
         )
     )
 
@@ -144,6 +155,29 @@ def draw_segments(canvas):
 def join(canvas, point1: Point, point2: Point):
     canvas.create_line(point1.x, point1.y, point2.x, point2.y)
 
+def draw_strip(canvas, index, height, color):
+    canvas.create_rectangle(
+        index*CANVAS3D_STRIP_WIDTH,
+        CANVAS3D_HEIGHT/2 - height,
+        (index+1)*CANVAS3D_STRIP_WIDTH,
+        CANVAS3D_HEIGHT/2 + height,
+        color
+    )
+    draw_strip_floor(canvas, index, height, FLOOR_COLOR)
 
+def draw_strip_floor(canvas, index, height, color):
+    canvas.create_rectangle(
+        index*CANVAS3D_STRIP_WIDTH,
+        CANVAS3D_HEIGHT/2 + height,
+        (index+1)*CANVAS3D_STRIP_WIDTH,
+        CANVAS3D_HEIGHT,
+        color
+    )
+
+def find_height(distance):
+    if distance == 0:
+        distance = 1
+    height = 10*CANVAS3D_HEIGHT/distance
+    return height
 
 main()
