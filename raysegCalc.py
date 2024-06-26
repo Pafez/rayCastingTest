@@ -25,8 +25,8 @@ class Ray_XSegment(Ray):
         self.safe_origin = None
         self.direct_offset = direction_offset
 
-def is_intersect(ray: Ray_XSegment, segment: Segment):
-    acc = 1
+def intersection_rayx_segment(ray: Ray_XSegment, segment: Segment):
+    acc = 0.1
     x1 = ray.origin.x
     y1 = ray.origin.y
     x2 = ray.origin.x+acc*cos(ray.direct+ray.direct_offset)
@@ -60,6 +60,35 @@ def is_intersect(ray: Ray_XSegment, segment: Segment):
     ray.safe_origin = Point(
         ray.origin.x+ray.safe_distance*cos(ray.direct+ray.direct_offset),
         ray.origin.y+ray.safe_distance*sin(ray.direct+ray.direct_offset)
+    )
+
+    return intersection
+
+def intersection_2segment(segment1: Segment, segment2: Segment):
+    x1 = segment1.point1.x
+    y1 = segment1.point1.y
+    x2 = segment1.point2.x
+    y2 = segment1.point2.y
+    x3 = segment2.point1.x
+    y3 = segment2.point1.y
+    x4 = segment2.point2.x
+    y4 = segment2.point2.y
+
+    num_u = (x1-x2)*(y1-y3)-(y1-y2)*(x1-x3)
+    num_t = (x1-x3)*(y3-y4)-(y1-y3)*(x3-x4)
+    den = (x1-x2)*(y3-y4)-(y1-y2)*(x3-x4)
+    if den == 0:
+        return None
+    
+    u = -num_u/den
+    t = num_t/den
+
+    if not (0 <= u <= 1 and 0 <= t <= 1):
+        return None
+
+    intersection = Point(
+        x3 + u*(x4-x3),
+        y3 + u*(y4-y3)
     )
 
     return intersection

@@ -45,7 +45,7 @@ while True:
         ray.origin = mouse
         ray.segment = None
         for segment in segments:
-            intersection = is_intersect(ray, segment)
+            intersection = intersection_rayx_segment(ray, segment)
             if intersection != None:
                 if ray.segment == None or distance_2P(ray.origin, ray.intersection) > distance_2P(ray.origin, intersection):
                     ray.segment = segment
