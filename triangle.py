@@ -11,7 +11,7 @@ CANVAS_HEIGHT = 400
 SEGMENT_COUNT = 4 + 7
 COLORS = ["red", "green", "blue", "orange", "purple", "cyan", "yellow"]
 FLOOR_COLOR = "lightgrey"
-ROOF_COLOR = "black"
+ROOF_COLOR = "white"
 
 PLAYER_NECK_LENGTH = 10
 PLAYER_MOVEMENT_SPEED = 3

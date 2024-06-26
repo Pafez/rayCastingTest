@@ -26,7 +26,7 @@ class Ray_XSegment(Ray):
         self.direct_offset = direction_offset
 
 def intersection_rayx_segment(ray: Ray_XSegment, segment: Segment):
-    acc = 0.1
+    acc = -10
     x1 = ray.origin.x
     y1 = ray.origin.y
     x2 = ray.origin.x+acc*cos(ray.direct+ray.direct_offset)
