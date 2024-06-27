@@ -15,7 +15,7 @@ ROOF_COLOR = "white"
 
 PLAYER_NECK_LENGTH = 10
 PLAYER_MOVEMENT_SPEED = 3
-PLAYER_ROTATION_SPEED = 0.2
+PLAYER_ROTATION_SPEED = 0.1
 RAY_COUNT = 500
 FOV = pi/3
 
@@ -202,7 +202,7 @@ def draw_floor_3D(canvas, color):
 def find_height(distance):
     if distance == 0:
         distance = 1
-    height = 10*CANVAS3D_HEIGHT/distance
+    height = 15*CANVAS3D_HEIGHT/distance
     return height
 
 main()

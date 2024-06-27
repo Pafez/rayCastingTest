@@ -11,6 +11,30 @@ class Segment:
         self.point2 = point2
         self.color = color
 
+class Block:
+    def __init__(self, point: Point, width = 1, height = 1, color: str = "black", is_hitbox: bool = True) -> None:
+        self.point = point
+        self.width = width
+        self.height = height
+        self.color = color
+        self.is_hitbox = is_hitbox
+        self.hitboxes = []
+        
+        if is_hitbox:
+            self.create_hitbox()
+
+    def create_hitbox(self):
+        p1 = self.point
+        p2 = Point(self.point.x, self.point.y + self.height)
+        p3 = Point(self.point.x + self.width, self.point.y + self.height)
+        p4 = Point(self.point.x + self.width, self.point.y)
+        self.hitboxes = [
+            Segment(p1, p2),
+            Segment(p2, p3),
+            Segment(p3, p4),
+            Segment(p4, p1),
+        ]
+
 class Ray:
     def __init__(self, origin: Point, direction) -> None:
         self.origin = origin
