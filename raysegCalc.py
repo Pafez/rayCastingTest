@@ -12,28 +12,35 @@ class Segment:
         self.color = color
 
 class Block:
-    def __init__(self, point: Point, width = 1, height = 1, color: str = "black", is_hitbox: bool = True) -> None:
+    def __init__(self, point: Point, width = 1, height = 1, color: str = "black", is_rigid: bool = True) -> None:
         self.point = point
         self.width = width
         self.height = height
         self.color = color
-        self.is_hitbox = is_hitbox
-        self.hitboxes = []
-        
-        if is_hitbox:
-            self.create_hitbox()
+        self.is_hitbox = is_rigid
+        self.borders = []
 
-    def create_hitbox(self):
-        p1 = self.point
-        p2 = Point(self.point.x, self.point.y + self.height)
-        p3 = Point(self.point.x + self.width, self.point.y + self.height)
-        p4 = Point(self.point.x + self.width, self.point.y)
-        self.hitboxes = [
-            Segment(p1, p2),
-            Segment(p2, p3),
-            Segment(p3, p4),
-            Segment(p4, p1),
+        self.set_vertices()
+        
+        if is_rigid:
+            self.create_borders()
+
+    def set_vertices(self):
+        self.p1 = self.point
+        self.p2 = Point(self.point.x, self.point.y + self.height)
+        self.p3 = Point(self.point.x + self.width, self.point.y + self.height)
+        self.p4 = Point(self.point.x + self.width, self.point.y)
+
+    def create_borders(self):
+        self.borders = [
+            Segment(self.p1, self.p2, self.color),
+            Segment(self.p2, self.p3, self.color),
+            Segment(self.p3, self.p4, self.color),
+            Segment(self.p4, self.p1, self.color),
         ]
+
+    def draw_block(self, canvas):
+        canvas.create_rectangle(self.p1.x, self.p1.y, self.p3.x, self.p3.y, self.color)
 
 class Ray:
     def __init__(self, origin: Point, direction) -> None:

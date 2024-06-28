@@ -81,6 +81,8 @@ def main():
                 draw_ray(canvas, ray)
                 draw_strip(canvas3D, ray_index, find_height(distance_2P(ray.origin, ray.intersection)), ray.segment.color)
 
+        fblock.draw_block(canvas)
+
         player1.reconstruct()
         draw_segments(canvas)
         
@@ -155,14 +157,8 @@ segments = [
     Segment(Point(400, 0), Point(0, 0))
 ]
 
-for i in range(SEGMENT_COUNT-4):
-    segments.append(
-        Segment(
-            Point(randint(0, CANVAS_WIDTH), randint(0, CANVAS_HEIGHT)),
-            Point(randint(0, CANVAS_WIDTH), randint(0, CANVAS_HEIGHT)),
-            COLORS[randint(0, len(COLORS)-1)]
-        )
-    )
+fblock = Block(Point(50, 200), 100, 10, 'red')
+segments.extend(fblock.borders)
 
 def draw_segments(canvas):
     for segment in segments:
