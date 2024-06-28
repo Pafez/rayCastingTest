@@ -65,7 +65,7 @@ def main():
             if intersection_2segment(segment, Segment(player_new_head_pos, player_prev_head_pos)) != None:
                 player1.centre = player_prev_pos_data.origin
                 player1.direct = player_prev_pos_data.direct
-                break 
+                break
 
         for ray_index in range(len(player1.vision_rays)):
             ray = player1.vision_rays[ray_index]
