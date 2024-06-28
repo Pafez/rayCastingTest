@@ -72,6 +72,7 @@ def main():
             ray.origin = player1.head
             ray.direct_offset = player1.direct
             ray.segment = None
+            fisheye_corr_angle = ray.direct
             for segment in segments:
                 intersection = intersection_rayx_segment(ray, segment)
                 if intersection != None and (ray.segment == None or distance_2P(ray.origin, ray.intersection) > distance_2P(ray.origin, intersection)):
@@ -79,9 +80,10 @@ def main():
                     ray.intersection = intersection
             if ray.segment != None:
                 draw_ray(canvas, ray)
-                draw_strip(canvas3D, ray_index, find_height(distance_2P(ray.origin, ray.intersection)), ray.segment.color)
+                draw_strip(canvas3D, ray_index, find_height(cos(fisheye_corr_angle)*distance_2P(ray.origin, ray.intersection)), ray.segment.color)
 
-        fblock.draw_block(canvas)
+        for wall in walls:
+            wall.draw_block(canvas)
 
         player1.reconstruct()
         draw_segments(canvas)
@@ -157,8 +159,10 @@ segments = [
     Segment(Point(400, 0), Point(0, 0))
 ]
 
-fblock = Block(Point(50, 200), 100, 10, 'red')
-segments.extend(fblock.borders)
+walls = []
+walls.append(Block(Point(50, 200), 100, 10, 'red'))
+for wall in walls:
+    segments.extend(wall.borders)
 
 def draw_segments(canvas):
     for segment in segments:
