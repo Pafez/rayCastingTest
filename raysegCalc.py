@@ -12,12 +12,13 @@ class Segment:
         self.color = color
 
 class Block:
-    def __init__(self, point: Point, width = 1, height = 1, color: str = "black", is_rigid: bool = True) -> None:
+    def __init__(self, point: Point, width = 1, height = 1, color: str = "black", is_rigid: bool = True, is_visible: bool = True) -> None:
         self.point = point
         self.width = width
         self.height = height
         self.color = color
         self.is_rigid = is_rigid
+        self.is_visible = is_visible
         self.borders = []
 
         self.set_vertices()
@@ -40,7 +41,10 @@ class Block:
         ]
 
     def draw_block(self, canvas):
-        canvas.create_rectangle(self.p1.x, self.p1.y, self.p3.x, self.p3.y, self.color)
+        if self.is_visible:
+            canvas.create_rectangle(self.p1.x, self.p1.y, self.p3.x, self.p3.y, self.color)
+            return 0
+        return 1
 
 class Ray:
     def __init__(self, origin: Point, direction) -> None:

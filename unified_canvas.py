@@ -27,8 +27,9 @@ CANVAS3D_STRIP_WIDTH = CANVAS3D_WIDTH/RAY_COUNT
 VB_WIDTH = 10
 VB_HEIGHT = 10
 
-canvas = Canvas(CANVAS_WIDTH, CANVAS_HEIGHT)
-canvas3D = Canvas(CANVAS3D_WIDTH, CANVAS3D_HEIGHT)
+canvas = Canvas(CANVAS_WIDTH, CANVAS_WIDTH)
+canvas_state = "2D"
+
 canvas.set_canvas_background_fill(FLOOR_COLOR)
 
 def main():
@@ -38,13 +39,13 @@ def main():
     run = True
     while run:
 
-        draw_background_3D(canvas3D)
+        if canvas_state == "3D":
+            draw_background_3D(canvas)
 
         player_prev_pos = [player1.head, player1.back_left, player1.back_right]
         player_prev_pos_data = deepcopy(Ray(player1.centre, player1.direct))
 
         key_events = canvas.get_new_key_presses()
-        key_events.extend(canvas3D.get_new_key_presses())
         for i in range(len(key_events)):
             key_events[i] = key_events[i].keysym
 
@@ -62,6 +63,8 @@ def main():
                     player1.rotate(PLAYER_ROTATION_SPEED)
                 case 'd':
                     player1.rotate(-PLAYER_ROTATION_SPEED)
+                case 'o':
+                    toggle_canvas()
         
         player1.construct_vertices(player1.centre, player1.direct)
         player_new_pos = [player1.head, player1.back_left, player1.back_right]
@@ -86,20 +89,22 @@ def main():
                     ray.segment = segment
                     ray.intersection = intersection
             if ray.segment != None:
-                draw_ray(canvas, ray)
-                draw_strip(canvas3D, ray_index, find_height(cos(fisheye_corr_angle)*distance_2P(ray.origin, ray.intersection)), ray.segment.color)
+                if canvas_state == "2D":
+                    draw_ray(canvas, ray)
+                elif canvas_state == "3D":
+                    draw_strip(canvas, ray_index, find_height(cos(fisheye_corr_angle)*distance_2P(ray.origin, ray.intersection)), ray.segment.color)
 
-        for wall in walls:
-            wall.draw_block(canvas)
-        
-        player1.construct_body()
-        draw_segments(canvas)
-        
+        if canvas_state == "2D":
+            for wall in walls:
+                wall.draw_block(canvas)
+            
+            player1.draw_body()
+            draw_segments(canvas)
+
         canvas.update()
         sleep(0.05)
         canvas.clear()
-        canvas3D.clear()
-    
+
 class Player:
     def __init__(self, centre, direct, adjusted_fov=2*pi, ray_count = RAY_COUNT):
         global canvas
@@ -112,11 +117,11 @@ class Player:
             direct = adjusted_fov*i/ray_count - adjusted_fov/2
             self.vision_rays.append(Ray_XSegment(Point(0, 0), direct, direction_offset=self.direct, safe_distance=15))
 
-        self.construct()
+        self.construct_vertices(self.centre, self.direct)
 
     def construct(self):
         self.construct_vertices(self.centre, self.direct)
-        self.construct_body()
+        self.draw_body()
 
     def construct_vertices(self, centre, direct):
         self.head = Point(
@@ -134,7 +139,7 @@ class Player:
             centre.y+PLAYER_NECK_LENGTH*sin(direct-pi*3/4)
         )
 
-    def construct_body(self):
+    def draw_body(self):
         self.body = {}
         self.body["body_left"] = canvas.create_line(self.head.x, self.head.y, self.back_left.x, self.back_left.y)
         self.body["body_right"] = canvas.create_line(self.head.x, self.head.y, self.back_right.x, self.back_right.y)
@@ -155,7 +160,6 @@ class Player:
     def move(self, distance):
         self.centre.x += distance*cos(self.direct)
         self.centre.y += distance*sin(self.direct)
-
 
 segments = [
     Segment(Point(0, 0), Point(0, 400)),
@@ -209,5 +213,13 @@ def find_height(distance):
         distance = 1
     height = 15*CANVAS3D_HEIGHT/distance
     return height
+
+def toggle_canvas():
+    global canvas_state
+    if canvas_state == "3D":
+        canvas_state = "2D"
+    else:
+        canvas_state = "3D"
+    
 
 main()
