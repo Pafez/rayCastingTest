@@ -17,7 +17,7 @@ class Block:
         self.width = width
         self.height = height
         self.color = color
-        self.is_hitbox = is_rigid
+        self.is_rigid = is_rigid
         self.borders = []
 
         self.set_vertices()
