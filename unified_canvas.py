@@ -20,9 +20,8 @@ RAY_COUNT = 500
 FOV = pi/3
 
 adjusted_fov = pi*((FOV/pi)%2)
-CANVAS3D_WIDTH = int(CANVAS_WIDTH+CANVAS_WIDTH/2*adjusted_fov/(2*pi))
-CANVAS3D_HEIGHT = CANVAS_HEIGHT
-CANVAS3D_STRIP_WIDTH = CANVAS3D_WIDTH/RAY_COUNT
+
+CANVAS3D_STRIP_WIDTH = CANVAS_WIDTH/RAY_COUNT
 
 VB_WIDTH = 10
 VB_HEIGHT = 10
@@ -33,11 +32,20 @@ canvas_state = "2D"
 canvas.set_canvas_background_fill(FLOOR_COLOR)
 
 def main():
+    global canvas_state
     
     player1 = Player(Point(300, 300), 0, adjusted_fov)
 
     run = True
     while run:
+        
+        goal = canvas.create_rectangle(300, 20, 310, 30, "lime")
+        
+        k = canvas.find_overlapping(player1.head.x, player1.head.y, player1.head.x+1, player1.head.y+1)
+        if goal in k:
+            canvas_state = "2D"
+        else:
+            canvas_state = "3D"
 
         if canvas_state == "3D":
             draw_background_3D(canvas)
@@ -68,7 +76,7 @@ def main():
         
         player1.construct_vertices(player1.centre, player1.direct)
         player_new_pos = [player1.head, player1.back_left, player1.back_right]
-        #print(distance_2P(player_new_head_pos, player_prev_head_pos))
+ 
         for segment in segments:
             for i in range(3):
                 if intersection_2segment(segment, Segment(player_new_pos[i], player_prev_pos[i])) != None:
@@ -141,9 +149,9 @@ class Player:
 
     def draw_body(self):
         self.body = {}
-        self.body["body_left"] = canvas.create_line(self.head.x, self.head.y, self.back_left.x, self.back_left.y)
-        self.body["body_right"] = canvas.create_line(self.head.x, self.head.y, self.back_right.x, self.back_right.y)
-        self.body["body_back"] = canvas.create_line(self.back_left.x, self.back_left.y, self.back_right.x, self.back_right.y)
+        self.body["body_left"] = canvas.create_line(self.head.x, self.head.y, self.back_left.x, self.back_left.y, width=3)
+        self.body["body_right"] = canvas.create_line(self.head.x, self.head.y, self.back_right.x, self.back_right.y, width=3)
+        self.body["body_back"] = canvas.create_line(self.back_left.x, self.back_left.y, self.back_right.x, self.back_right.y, width=3)
 
     def reconstruct(self):
         self.delete_body()
@@ -170,6 +178,7 @@ segments = [
 
 walls = []
 walls.append(Block(Point(50, 200), 100, 10, 'red'))
+walls.append(Block(Point(300, 20), width=10, height=10, color="lime"))
 for wall in walls:
     segments.extend(wall.borders)
 
@@ -192,9 +201,9 @@ def draw_ray(canvas, ray):
 def draw_strip(canvas, index, height, color):
     canvas.create_rectangle(
         index*CANVAS3D_STRIP_WIDTH,
-        CANVAS3D_HEIGHT/2 - height,
+        CANVAS_HEIGHT/2 - height,
         (index+1)*CANVAS3D_STRIP_WIDTH,
-        CANVAS3D_HEIGHT/2 + height,
+        CANVAS_HEIGHT/2 + height,
         color
     )
 
@@ -203,15 +212,15 @@ def draw_background_3D(canvas):
     draw_floor_3D(canvas, FLOOR_COLOR)
 
 def draw_roof_3D(canvas, color):
-    canvas.create_rectangle(0, 0, CANVAS3D_WIDTH, CANVAS3D_HEIGHT/2, color)
+    canvas.create_rectangle(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT/2, color)
 
 def draw_floor_3D(canvas, color):
-    canvas.create_rectangle(0, CANVAS3D_HEIGHT/2, CANVAS3D_WIDTH, CANVAS3D_HEIGHT, color)
+    canvas.create_rectangle(0, CANVAS_HEIGHT/2, CANVAS_WIDTH, CANVAS_HEIGHT, color)
 
 def find_height(distance):
     if distance == 0:
         distance = 1
-    height = 15*CANVAS3D_HEIGHT/distance
+    height = 15*CANVAS_HEIGHT/distance
     return height
 
 def toggle_canvas():
