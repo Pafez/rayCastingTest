@@ -10,9 +10,9 @@ from mazedata import maze_raw
 CANVAS_WIDTH = 400
 CANVAS_HEIGHT = 400
 SEGMENT_COUNT = 4 + 7
-COLORS = ["blue", "orange", "purple", "cyan", "yellow", "pink", "magenta", "violet"]
-FLOOR_COLOR = "lightgrey"
-ROOF_COLOR = "black"
+COLORS = ["blue", "orange", "purple", "cyan", "yellow", "pink", "magenta", "violet", "slateblue2", "turquoise2", "chartreuse4", "chocolate3", "firebrick3", "dark slate gray"]
+FLOOR_COLOR = "thistle2"
+ROOF_COLOR = "midnight blue"
 
 PLAYER_NECK_LENGTH = 5
 PLAYER_MOVEMENT_SPEED = 4
@@ -30,18 +30,20 @@ VB_HEIGHT = 10
 canvas = Canvas(CANVAS_WIDTH, CANVAS_WIDTH)
 canvas_state = "2D"
 
+score = 0
+
 def main():
-    global canvas_state, map_point_ids
+    global canvas_state, map_point_ids, score
     canvas.set_canvas_background_fill(FLOOR_COLOR)
     
-    player1 = Player(Point(390, 230), pi, adjusted_fov)
+    player1 = Player(Point(380, 230), pi, adjusted_fov)
 
     run = True
     gen = 0
     win = False
     while run:
         
-        goal = canvas.create_rectangle(333, 143, 343, 153, "green")
+        goal_id = canvas.create_rectangle(333, 143, 343, 153, "green")
 
         map_point_ids = []
         for map_point in map_points:
@@ -56,7 +58,7 @@ def main():
             else:
                 canvas_state = "3D"
 
-        if goal in player_head_sense:
+        if goal_id in player_head_sense:
             win = True
             run = False
             break
@@ -117,36 +119,43 @@ def main():
         canvas.clear()
         gen += 1
 
-    canvas.quit()
     if win:
         score = 1000000//gen
         print("Score: ", score)
+    return win
 
 def title_screen():
     global canvas
-    canvas.set_canvas_background_fill("darkgrey")
+    canvas.set_canvas_background_fill("lightgrey")
+    canvas.create_image(0, 0, "images\\title_bg2.png")
     canvas.create_text(40, 20, "Welcome to The Maze", "Callibri", 25, "crimson")
 
-    canvas.create_text(20, 80, "Objectives", "Arial", 15, "green")
-    canvas.create_text(40, 105, "- Explore the Maze", "Callibri", 13, "green")
-    canvas.create_text(40, 120, "- Reach the Green Door", "Callibri", 13, "green")
-    canvas.create_text(40, 135, "- Have fun", "Callibri", 13, "green")
+    canvas.create_text(20, 80, "Objectives", "Arial", 15, "darkgreen")
+    canvas.create_text(40, 105, "- Explore the Maze", "Callibri", 13, "darkgreen")
+    canvas.create_text(40, 120, "- Reach the Green Object", "Callibri", 13, "darkgreen")
+    canvas.create_text(40, 135, "- Have fun", "Callibri", 13, "darkgreen")
 
-    canvas.create_text(20, 160, "Rules", "Arial", 15, "red")
-    canvas.create_text(40, 185, "- Touch the red object to see the map", "Callibri", 13, "red")
-    canvas.create_text(40, 200, "- Completing sooner gives you a better score", "Callibri", 13, "red")
-    canvas.create_text(40, 215, "- Have fun", "Callibri", 13, "red")
+    canvas.create_text(20, 160, "Rules", "Arial", 15, "darkred")
+    canvas.create_text(40, 185, "- Touch the Red Object to see the map", "Callibri", 13, "darkred")
+    canvas.create_text(40, 200, "- Completing sooner gives you a better score", "Callibri", 13, "darkred")
+    canvas.create_text(40, 215, "- Have fun", "Callibri", 13, "darkred")
 
-    canvas.create_text(20, 240, "Controls (WASD)", "Arial", 15, "blue")
-    canvas.create_text(40, 265, "W - to go forward", "Callibri", 13, "blue")
-    canvas.create_text(40, 280, "S - to go backwards", "Callibri", 13, "blue")
-    canvas.create_text(40, 295, "A - to pan left", "Callibri", 13, "blue")
-    canvas.create_text(40, 310, "D - to pan right", "Callibri", 13, "blue")
-    canvas.create_text(40, 325, "Esc - to quit the game", "Callibri", 13, "blue")
-    canvas.create_text(40, 340, "*Make sure caps lock is off*", "Callibri", 13, "blue")
+    canvas.create_text(20, 240, "Controls (WASD)", "Arial", 15, "darkblue")
+    canvas.create_text(40, 265, "W - to go forward", "Callibri", 13, "darkblue")
+    canvas.create_text(40, 280, "S - to go backwards", "Callibri", 13, "darkblue")
+    canvas.create_text(40, 295, "A - to pan left", "Callibri", 13, "darkblue")
+    canvas.create_text(40, 310, "D - to pan right", "Callibri", 13, "darkblue")
+    canvas.create_text(40, 325, "Esc - to quit the game", "Callibri", 13, "darkblue")
+    canvas.create_text(40, 340, "*Make sure caps lock is off*", "Callibri", 13, "darkblue")
 
     canvas.create_text(150, 370, "Click to Start...", "Callibri", 14, "black")
 
+    canvas.wait_for_click()
+    canvas.clear()
+
+def win_screen(score):
+    canvas.create_image(0, 0, "images\\win_bg.png")
+    canvas.create_text(100, 335, "SCORE: "+str(score), "Arial", 30, "white")
     canvas.wait_for_click()
     canvas.clear()
 
@@ -307,6 +316,11 @@ walls.extend(map_points)
 for map_point in map_points:
     segments.extend(map_point.borders)
 
+goal = Block(Point(333, 143), 10, 10, "green")
+
+walls.append(goal)
+segments.extend(goal.borders)
+
 def draw_segments(canvas):
     for segment in segments:
         canvas.create_line(
@@ -354,6 +368,9 @@ def toggle_canvas():
         canvas_state = "2D"
     else:
         canvas_state = "3D"
-    
+
+
 title_screen()
-main()
+win = main()
+if win:
+    win_screen(score)
