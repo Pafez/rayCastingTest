@@ -10,7 +10,7 @@ from mazedata import maze_raw
 CANVAS_WIDTH = 400
 CANVAS_HEIGHT = 400
 SEGMENT_COUNT = 4 + 7
-COLORS = ["blue", "orange", "purple", "cyan", "yellow", "pink", "magenta", "violet", "slateblue2", "turquoise2", "chartreuse4", "chocolate3", "firebrick3", "dark slate gray"]
+COLORS = ["blue", "orange", "purple", "cyan", "yellow", "pink", "magenta", "violet", "slateblue2", "turquoise2", "chartreuse4", "chocolate3", "firebrick3", "dark slate gray", "darkorchid4"]
 FLOOR_COLOR = "thistle2"
 ROOF_COLOR = "midnight blue"
 
