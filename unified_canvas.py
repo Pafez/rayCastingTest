@@ -46,13 +46,12 @@ def main():
         if goal in map_points:
             canvas_state = "2D"
         else:
-            canvas_state = "3D"
+            canvas_state = "2D"
 
         if canvas_state == "3D":
             draw_background_3D(canvas)
 
         player_prev_pos = [player1.head, player1.back_left, player1.back_right]
-        player_prev_pos_data = deepcopy(Ray(player1.centre, player1.direct))
 
         key_events = canvas.get_new_key_presses()
         for i in range(len(key_events)):
@@ -65,9 +64,11 @@ def main():
                     run = False
                     break
                 case 'w':
-                    player1.move(PLAYER_MOVEMENT_SPEED)
+                    player1.moveX(PLAYER_MOVEMENT_SPEED, player_prev_pos)
+                    player1.moveY(PLAYER_MOVEMENT_SPEED, player_prev_pos)
                 case 's':
-                    player1.move(-PLAYER_MOVEMENT_SPEED)
+                    player1.moveX(-PLAYER_MOVEMENT_SPEED, player_prev_pos)
+                    player1.moveY(-PLAYER_MOVEMENT_SPEED, player_prev_pos)
                 case 'a':
                     player1.rotate(PLAYER_ROTATION_SPEED)
                 case 'd':
@@ -76,15 +77,6 @@ def main():
                     toggle_canvas()
         
         player1.construct_vertices(player1.centre, player1.direct)
-        player_new_pos = [player1.head, player1.back_left, player1.back_right]
- 
-        for segment in segments:
-            for i in range(3):
-                if intersection_2segment(segment, Segment(player_new_pos[i], player_prev_pos[i])) != None:
-                    player1.centre = player_prev_pos_data.origin
-                    player1.direct = player_prev_pos_data.direct
-                    player1.construct_vertices(player1.centre, player1.direct)
-                    break
 
         for ray_index in range(len(player1.vision_rays)):
             ray = player1.vision_rays[ray_index]
@@ -169,6 +161,54 @@ class Player:
     def move(self, distance):
         self.centre.x += distance*cos(self.direct)
         self.centre.y += distance*sin(self.direct)
+
+    def moveX(self, distance, player_prev_pos):
+        new_x = self.centre.x + distance*cos(self.direct)
+        player_new_pos = []
+        player_new_pos.append(Point(
+            new_x+PLAYER_NECK_LENGTH*cos(self.direct),
+            self.centre.y+PLAYER_NECK_LENGTH*sin(self.direct)
+        ))
+
+        player_new_pos.append(Point(
+            new_x+PLAYER_NECK_LENGTH*cos(self.direct+pi*3/4),
+            self.centre.y+PLAYER_NECK_LENGTH*sin(self.direct+pi*3/4)
+        ))
+
+        player_new_pos.append(Point(
+            new_x+PLAYER_NECK_LENGTH*cos(self.direct-pi*3/4),
+            self.centre.y+PLAYER_NECK_LENGTH*sin(self.direct-pi*3/4)
+        ))
+        for segment in segments:
+            for i in range(3):
+                if intersection_2segment(segment, Segment(player_new_pos[i], player_prev_pos[i])) != None:
+                    return 1
+        self.centre.x = new_x
+        return 0
+    
+    def moveY(self, distance, player_prev_pos):
+        new_y = self.centre.y + distance*sin(self.direct)
+        player_new_pos = []
+        player_new_pos.append(Point(
+            self.centre.x+PLAYER_NECK_LENGTH*cos(self.direct),
+            new_y+PLAYER_NECK_LENGTH*sin(self.direct)
+        ))
+
+        player_new_pos.append(Point(
+            self.centre.x+PLAYER_NECK_LENGTH*cos(self.direct+pi*3/4),
+            new_y+PLAYER_NECK_LENGTH*sin(self.direct+pi*3/4)
+        ))
+
+        player_new_pos.append(Point(
+            self.centre.x+PLAYER_NECK_LENGTH*cos(self.direct-pi*3/4),
+            new_y+PLAYER_NECK_LENGTH*sin(self.direct-pi*3/4)
+        ))
+        for segment in segments:
+            for i in range(3):
+                if intersection_2segment(segment, Segment(player_new_pos[i], player_prev_pos[i])) != None:
+                    return 1
+        self.centre.y = new_y
+        return 0
 
 segments = [
     Segment(Point(0, 0), Point(0, 400)),
