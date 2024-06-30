@@ -10,7 +10,7 @@ from mazedata import maze_raw
 CANVAS_WIDTH = 400
 CANVAS_HEIGHT = 400
 SEGMENT_COUNT = 4 + 7
-COLORS = ["red", "blue", "orange", "purple", "cyan", "yellow", "pink", "magenta", "violet"]
+COLORS = ["blue", "orange", "purple", "cyan", "yellow", "pink", "magenta", "violet"]
 FLOOR_COLOR = "lightgrey"
 ROOF_COLOR = "white"
 
@@ -30,23 +30,36 @@ VB_HEIGHT = 10
 canvas = Canvas(CANVAS_WIDTH, CANVAS_WIDTH)
 canvas_state = "2D"
 
-canvas.set_canvas_background_fill(FLOOR_COLOR)
-
 def main():
-    global canvas_state
+    global canvas_state, map_point_ids
+    canvas.set_canvas_background_fill(FLOOR_COLOR)
     
-    player1 = Player(Point(360, 230), pi, adjusted_fov)
+    player1 = Player(Point(390, 230), pi, adjusted_fov)
 
     run = True
+    gen = 0
+    win = False
     while run:
         
-        goal = canvas.create_rectangle(333, 143, 343, 153, "lime")
-        
-        map_points = canvas.find_overlapping(player1.head.x, player1.head.y, player1.head.x+1, player1.head.y+1)
-        if goal in map_points:
-            canvas_state = "2D"
-        else:
-            canvas_state = "2D"
+        goal = canvas.create_rectangle(333, 143, 343, 153, "green")
+
+        map_point_ids = []
+        for map_point in map_points:
+            map_point_ids.append(canvas.create_rectangle(map_point.point.x, map_point.point.y, map_point.point.x+map_point.width, map_point.point.y+map_point.height, map_point.color))
+                
+        player_head_sense = canvas.find_overlapping(player1.head.x-5, player1.head.y-5, player1.head.x+5, player1.head.y+5)
+
+        for map_point_id in map_point_ids:
+            if map_point_id in player_head_sense:
+                canvas_state = "2D"
+                break
+            else:
+                canvas_state = "3D"
+
+        if goal in player_head_sense:
+            win = True
+            run = False
+            break
 
         if canvas_state == "3D":
             draw_background_3D(canvas)
@@ -70,11 +83,9 @@ def main():
                     player1.moveX(-PLAYER_MOVEMENT_SPEED, player_prev_pos)
                     player1.moveY(-PLAYER_MOVEMENT_SPEED, player_prev_pos)
                 case 'a':
-                    player1.rotate(PLAYER_ROTATION_SPEED)
+                    player1.rotate(PLAYER_ROTATION_SPEED, player_prev_pos)
                 case 'd':
-                    player1.rotate(-PLAYER_ROTATION_SPEED)
-                case 'o':
-                    toggle_canvas()
+                    player1.rotate(-PLAYER_ROTATION_SPEED, player_prev_pos)
         
         player1.construct_vertices(player1.centre, player1.direct)
 
@@ -103,8 +114,23 @@ def main():
             draw_segments(canvas)
 
         canvas.update()
-        sleep(0.05)
         canvas.clear()
+        gen += 1
+
+    canvas.quit()
+    score = 1000000//gen
+    print("Score: ", score)
+
+def title_screen():
+    global canvas
+    canvas.create_text(50, 50, "Welcome to The Maze", "Callibri", 25, "red")
+
+    canvas.create_text(20, 120, "Objective", "Arial", 15, "green")
+    canvas.create_text(40, 145, "Objective", "Arial", 13, "green")
+
+
+    canvas.wait_for_click()
+    canvas.clear()
 
 class Player:
     def __init__(self, centre, direct, adjusted_fov=2*pi, ray_count = RAY_COUNT):
@@ -155,8 +181,30 @@ class Player:
             canvas.delete(body_part)
         self.body = {}
 
-    def rotate(self, direct):
-        self.direct -= direct
+    def rotate(self, direct, player_prev_pos):
+        new_direct = self.direct - direct
+
+        player_new_pos = []
+        player_new_pos.append(Point(
+            self.centre.x+PLAYER_NECK_LENGTH*cos(new_direct),
+            self.centre.y+PLAYER_NECK_LENGTH*sin(new_direct)
+        ))
+
+        player_new_pos.append(Point(
+            self.centre.x+PLAYER_NECK_LENGTH*cos(new_direct+pi*3/4),
+            self.centre.y+PLAYER_NECK_LENGTH*sin(new_direct+pi*3/4)
+        ))
+
+        player_new_pos.append(Point(
+            self.centre.x+PLAYER_NECK_LENGTH*cos(new_direct-pi*3/4),
+            self.centre.y+PLAYER_NECK_LENGTH*sin(new_direct-pi*3/4)
+        ))
+        for segment in segments:
+            for i in range(3):
+                if intersection_2segment(segment, Segment(player_new_pos[i], player_prev_pos[i])) != None:
+                    return 1
+        self.direct = new_direct
+        return 0
 
     def move(self, distance):
         self.centre.x += distance*cos(self.direct)
@@ -229,6 +277,18 @@ for wall_raw in maze_raw:
 for wall in walls:
     segments.extend(wall.borders)
 
+map_points = [
+    Block(Point(340, 245), 5, 5, "red"),
+    Block(Point(62, 139), 5, 5, "red"),
+    Block(Point(14, 349), 5, 5, "red"),
+    Block(Point(290, 380), 5, 5, "red")
+]
+
+walls.extend(map_points)
+
+for map_point in map_points:
+    segments.extend(map_point.borders)
+
 def draw_segments(canvas):
     for segment in segments:
         canvas.create_line(
@@ -277,5 +337,5 @@ def toggle_canvas():
     else:
         canvas_state = "3D"
     
-
+title_screen()
 main()
