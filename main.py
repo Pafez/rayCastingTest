@@ -369,8 +369,8 @@ def toggle_canvas():
     else:
         canvas_state = "3D"
 
-
-title_screen()
-win = main()
-if win:
-    win_screen(score)
+if __name__ == "__main__":
+    title_screen()
+    win = main()
+    if win:
+        win_screen(score)
