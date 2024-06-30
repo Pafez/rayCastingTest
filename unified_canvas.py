@@ -5,17 +5,18 @@ from copy import deepcopy
 from random import randint
 from tapelist import TapeList
 from raysegCalc import *
+from mazedata import maze_raw
 
 CANVAS_WIDTH = 400
 CANVAS_HEIGHT = 400
 SEGMENT_COUNT = 4 + 7
-COLORS = ["red", "green", "blue", "orange", "purple", "cyan", "yellow"]
+COLORS = ["red", "blue", "orange", "purple", "cyan", "yellow", "pink", "magenta", "violet"]
 FLOOR_COLOR = "lightgrey"
 ROOF_COLOR = "white"
 
-PLAYER_NECK_LENGTH = 10
-PLAYER_MOVEMENT_SPEED = 3
-PLAYER_ROTATION_SPEED = 0.1
+PLAYER_NECK_LENGTH = 5
+PLAYER_MOVEMENT_SPEED = 4
+PLAYER_ROTATION_SPEED = 0.2
 RAY_COUNT = 500
 FOV = pi/3
 
@@ -34,15 +35,15 @@ canvas.set_canvas_background_fill(FLOOR_COLOR)
 def main():
     global canvas_state
     
-    player1 = Player(Point(300, 300), 0, adjusted_fov)
+    player1 = Player(Point(360, 230), pi, adjusted_fov)
 
     run = True
     while run:
         
-        goal = canvas.create_rectangle(300, 20, 310, 30, "lime")
+        goal = canvas.create_rectangle(333, 143, 343, 153, "lime")
         
-        k = canvas.find_overlapping(player1.head.x, player1.head.y, player1.head.x+1, player1.head.y+1)
-        if goal in k:
+        map_points = canvas.find_overlapping(player1.head.x, player1.head.y, player1.head.x+1, player1.head.y+1)
+        if goal in map_points:
             canvas_state = "2D"
         else:
             canvas_state = "3D"
@@ -97,9 +98,9 @@ def main():
                     ray.segment = segment
                     ray.intersection = intersection
             if ray.segment != None:
-                if canvas_state == "2D":
-                    draw_ray(canvas, ray)
-                elif canvas_state == "3D":
+                #if canvas_state == "2D":
+                    #draw_ray(canvas, ray)
+                if canvas_state == "3D":
                     draw_strip(canvas, ray_index, find_height(cos(fisheye_corr_angle)*distance_2P(ray.origin, ray.intersection)), ray.segment.color)
 
         if canvas_state == "2D":
@@ -177,8 +178,14 @@ segments = [
 ]
 
 walls = []
-walls.append(Block(Point(50, 200), 100, 10, 'red'))
-walls.append(Block(Point(300, 20), width=10, height=10, color="lime"))
+for wall_raw in maze_raw:
+    if len(wall_raw) == 4:
+        walls.append(Block(
+            Point(wall_raw[0], wall_raw[1]),
+            wall_raw[2]-wall_raw[0],
+            wall_raw[3]-wall_raw[1],
+            COLORS[randint(0, len(COLORS) - 1)]
+    ))
 for wall in walls:
     segments.extend(wall.borders)
 
