@@ -17,10 +17,11 @@ ROOF_COLOR = "midnight blue"
 PLAYER_NECK_LENGTH = 5
 PLAYER_MOVEMENT_SPEED = 4
 PLAYER_ROTATION_SPEED = 0.2
-RAY_COUNT = 500
+RESOLUTION = 500
 FOV = pi/3
 
 adjusted_fov = pi*((FOV/pi)%2)
+RAY_COUNT = RESOLUTION
 
 CANVAS3D_STRIP_WIDTH = CANVAS_WIDTH/RAY_COUNT
 
@@ -138,15 +139,14 @@ def title_screen():
     canvas.create_text(20, 160, "Rules", "Arial", 15, "darkred")
     canvas.create_text(40, 185, "- Touch the Red Object to see the map", "Callibri", 13, "darkred")
     canvas.create_text(40, 200, "- Completing sooner gives you a better score", "Callibri", 13, "darkred")
-    canvas.create_text(40, 215, "- Have fun", "Callibri", 13, "darkred")
 
-    canvas.create_text(20, 240, "Controls (WASD)", "Arial", 15, "darkblue")
-    canvas.create_text(40, 265, "W - to go forward", "Callibri", 13, "darkblue")
-    canvas.create_text(40, 280, "S - to go backwards", "Callibri", 13, "darkblue")
-    canvas.create_text(40, 295, "A - to pan left", "Callibri", 13, "darkblue")
-    canvas.create_text(40, 310, "D - to pan right", "Callibri", 13, "darkblue")
-    canvas.create_text(40, 325, "Esc - to quit the game", "Callibri", 13, "darkblue")
-    canvas.create_text(40, 340, "*Make sure caps lock is off*", "Callibri", 13, "darkblue")
+    canvas.create_text(20, 225, "Controls (WASD)", "Arial", 15, "darkblue")
+    canvas.create_text(40, 250, "W - to go forward", "Callibri", 13, "darkblue")
+    canvas.create_text(40, 265, "S - to go backwards", "Callibri", 13, "darkblue")
+    canvas.create_text(40, 280, "A - to pan left", "Callibri", 13, "darkblue")
+    canvas.create_text(40, 295, "D - to pan right", "Callibri", 13, "darkblue")
+    canvas.create_text(40, 310, "Esc - to quit the game", "Callibri", 13, "darkblue")
+    canvas.create_text(40, 325, "*Make sure caps lock is off*", "Callibri", 13, "darkblue")
 
     canvas.create_text(150, 370, "Click to Start...", "Callibri", 14, "black")
 
