@@ -12,7 +12,7 @@ CANVAS_HEIGHT = 400
 SEGMENT_COUNT = 4 + 7
 COLORS = ["blue", "orange", "purple", "cyan", "yellow", "pink", "magenta", "violet"]
 FLOOR_COLOR = "lightgrey"
-ROOF_COLOR = "white"
+ROOF_COLOR = "black"
 
 PLAYER_NECK_LENGTH = 5
 PLAYER_MOVEMENT_SPEED = 4
@@ -118,22 +118,34 @@ def main():
         gen += 1
 
     canvas.quit()
-    score = 1000000//gen
-    print("Score: ", score)
+    if win:
+        score = 1000000//gen
+        print("Score: ", score)
 
 def title_screen():
     global canvas
-    canvas.create_text(45, 50, "Welcome to The Maze", "Callibri", 25, "red")
+    canvas.set_canvas_background_fill("darkgrey")
+    canvas.create_text(40, 20, "Welcome to The Maze", "Callibri", 25, "crimson")
 
-    canvas.create_text(20, 120, "Objective", "Arial", 15, "green")
-    canvas.create_text(40, 145, "Reach the Green Door", "Callibri", 13, "green")
+    canvas.create_text(20, 80, "Objectives", "Arial", 15, "green")
+    canvas.create_text(40, 105, "- Explore the Maze", "Callibri", 13, "green")
+    canvas.create_text(40, 120, "- Reach the Green Door", "Callibri", 13, "green")
+    canvas.create_text(40, 135, "- Have fun", "Callibri", 13, "green")
 
-    canvas.create_text(20, 120, "Objective", "Arial", 15, "green")
-    canvas.create_text(20, 120, "Objective", "Arial", 15, "green")
+    canvas.create_text(20, 160, "Rules", "Arial", 15, "red")
+    canvas.create_text(40, 185, "- Touch the red object to see the map", "Callibri", 13, "red")
+    canvas.create_text(40, 200, "- Completing sooner gives you a better score", "Callibri", 13, "red")
+    canvas.create_text(40, 215, "- Have fun", "Callibri", 13, "red")
 
-    canvas.create_text(20, 120, "Objective", "Arial", 15, "green")
-    canvas.create_text(20, 120, "Objective", "Arial", 15, "green")
+    canvas.create_text(20, 240, "Controls (WASD)", "Arial", 15, "blue")
+    canvas.create_text(40, 265, "W - to go forward", "Callibri", 13, "blue")
+    canvas.create_text(40, 280, "S - to go backwards", "Callibri", 13, "blue")
+    canvas.create_text(40, 295, "A - to pan left", "Callibri", 13, "blue")
+    canvas.create_text(40, 310, "D - to pan right", "Callibri", 13, "blue")
+    canvas.create_text(40, 325, "Esc - to quit the game", "Callibri", 13, "blue")
+    canvas.create_text(40, 340, "*Make sure caps lock is off*", "Callibri", 13, "blue")
 
+    canvas.create_text(150, 370, "Click to Start...", "Callibri", 14, "black")
 
     canvas.wait_for_click()
     canvas.clear()
@@ -265,10 +277,10 @@ class Player:
         return 0
 
 segments = [
-    Segment(Point(0, 0), Point(0, 400)),
-    Segment(Point(0, 400), Point(400, 400)),
-    Segment(Point(400, 400), Point(400, 0)),
-    Segment(Point(400, 0), Point(0, 0))
+    Segment(Point(0, 0), Point(0, 400), "grey"),
+    Segment(Point(0, 400), Point(400, 400), "grey"),
+    Segment(Point(400, 400), Point(400, 0), "grey"),
+    Segment(Point(400, 0), Point(0, 0), "grey")
 ]
 
 walls = []
@@ -343,5 +355,5 @@ def toggle_canvas():
     else:
         canvas_state = "3D"
     
-#title_screen()
+title_screen()
 main()
