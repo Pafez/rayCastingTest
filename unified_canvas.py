@@ -123,10 +123,16 @@ def main():
 
 def title_screen():
     global canvas
-    canvas.create_text(50, 50, "Welcome to The Maze", "Callibri", 25, "red")
+    canvas.create_text(45, 50, "Welcome to The Maze", "Callibri", 25, "red")
 
     canvas.create_text(20, 120, "Objective", "Arial", 15, "green")
-    canvas.create_text(40, 145, "Objective", "Arial", 13, "green")
+    canvas.create_text(40, 145, "Reach the Green Door", "Callibri", 13, "green")
+
+    canvas.create_text(20, 120, "Objective", "Arial", 15, "green")
+    canvas.create_text(20, 120, "Objective", "Arial", 15, "green")
+
+    canvas.create_text(20, 120, "Objective", "Arial", 15, "green")
+    canvas.create_text(20, 120, "Objective", "Arial", 15, "green")
 
 
     canvas.wait_for_click()
@@ -337,5 +343,5 @@ def toggle_canvas():
     else:
         canvas_state = "3D"
     
-title_screen()
+#title_screen()
 main()
